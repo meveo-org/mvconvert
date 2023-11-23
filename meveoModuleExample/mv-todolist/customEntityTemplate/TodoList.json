@@ -1,0 +1,11 @@
+{
+    "code" : "TodoList",
+    "name" : "Todo list",
+    "description" : "simple todo with a list of items",
+    "availableStorages" : [ "SQL" ],
+    "sqlStorageConfiguration" : {
+      "storeAsTable" : true
+    },
+    "samples" : [ ],
+    "audited" : false
+}

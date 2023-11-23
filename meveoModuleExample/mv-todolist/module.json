@@ -1,0 +1,10 @@
+{
+    "code" : "mv-todolist",
+    "description" : "Basic Todo List example",
+    "license" : "GPL",
+    "currentVersion" : "0.1",
+    "isInDraft" : false,
+    "autoCommit" : false,
+    "moduleDependencies" : [ ],
+    "moduleFiles" : [ ]
+  }
