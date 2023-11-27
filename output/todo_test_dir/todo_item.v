@@ -2,7 +2,8 @@ module mvtodolist
 
 @[table: 'todoitem']
 struct TodoItem {
-        uuid string
+    uuid string [primary]
     status ?string 
+    todolist ?TodoList 
     value ?string 
 }
