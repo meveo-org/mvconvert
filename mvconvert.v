@@ -7,11 +7,11 @@ struct ModuleData {
 	code                string
 	description         string
 	license             ?string
-	current_version     string   [json: currentVersion]
-	is_in_draft         bool     [json: isInDraft]
-	auto_commit         bool     [json: autoCommit]
-	module_dependencies ?[]string [json: moduleDependencies]
-	module_files        ?[]string [json: moduleFiles]
+	current_version     string   @[json: currentVersion]
+	is_in_draft         bool     @[json: isInDraft]
+	auto_commit         bool     @[json: autoCommit]
+	module_dependencies ?[]string @[json: moduleDependencies]
+	module_files        ?[]string @[json: moduleFiles]
 }
 
 fn ensure_directory_exists(dir_path string) {

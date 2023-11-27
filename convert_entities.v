@@ -6,46 +6,46 @@ import json
 struct CustomField {
     code                        string
     description                 string
-    field_type                   string [json: 'fieldType']
-    account_level                ?string [json: 'accountLevel']
-    applies_to                   string [json: 'appliesTo']
-    default_value                ?string [json: 'defaultValue']
-    use_inherited_as_default_value  bool   [json: 'useInheritedAsDefaultValue']
-    storage_type                 string [json: 'storageType']
-    value_required               bool   [json: 'valueRequired']
-    versionable                 bool   [json: 'versionable']
-    trigger_end_period_event       ?bool   [json: 'triggerEndPeriodEvent']
-    entity_class                  ?string [json: 'entityClazz']
-    allow_edit                   bool   [json: 'allowEdit']
-    hide_on_new                   bool   [json: 'hideOnNew']
-    max_value                    ?int    [json: 'maxValue']
+    field_type                   string @[json: 'fieldType']
+    account_level                ?string @[json: 'accountLevel']
+    applies_to                   string @[json: 'appliesTo']
+    default_value                ?string @[json: 'defaultValue']
+    use_inherited_as_default_value  bool   @[json: 'useInheritedAsDefaultValue']
+    storage_type                 string @[json: 'storageType']
+    value_required               bool   @[json: 'valueRequired']
+    versionable                 bool   @[json: 'versionable']
+    trigger_end_period_event       ?bool   @[json: 'triggerEndPeriodEvent']
+    entity_class                  ?string @[json: 'entityClazz']
+    allow_edit                   bool   @[json: 'allowEdit']
+    hide_on_new                   bool   @[json: 'hideOnNew']
+    max_value                    ?int    @[json: 'maxValue']
     content_types                ?[]string
     file_extensions              ?[]string
-    save_on_explorer              bool   [json: 'saveOnExplorer']
-    gui_position                 ?string [json: 'guiPosition']
-    identifier                  bool   [json: 'identifier']
-    applicable_on_el              ?string [json: 'applicableOnEl']
+    save_on_explorer              bool   @[json: 'saveOnExplorer']
+    gui_position                 ?string @[json: 'guiPosition']
+    identifier                  bool   @[json: 'identifier']
+    applicable_on_el              ?string @[json: 'applicableOnEl']
     storages                    []string
     samples                     ?[]string
-    summary                     bool   [json: 'summary']
-    audited                     bool   [json: 'audited']
-    persisted                   bool   [json: 'persisted']
-    filter                      bool   [json: 'filter']
-    unique                      bool   [json: 'unique']
+    summary                     bool   @[json: 'summary']
+    audited                     bool   @[json: 'audited']
+    persisted                   bool   @[json: 'persisted']
+    filter                      bool   @[json: 'filter']
+    unique                      bool   @[json: 'unique']
 }
 
 struct SqlStorageConfiguration {
-	store_as_table bool [json: 'storeAsTable']
+	store_as_table bool @[json: 'storeAsTable']
 }
 
 struct CustomEntity {
     code string
     name string
     description string
-    category_code ?string [json: 'customEntityCategoryCode']
+    category_code ?string @[json: 'customEntityCategoryCode']
     mut: fields []CustomField
-    available_storages []string [json: "availableStorages" ]
-    sql_storage_configuration SqlStorageConfiguration [json: "sqlStorageConfiguration" ]
+    available_storages []string @[json: "availableStorages" ]
+    sql_storage_configuration SqlStorageConfiguration @[json: "sqlStorageConfiguration" ]
     samples []string
     audited  bool
     module_name ?string
@@ -129,7 +129,7 @@ fn generate_sql_field(field CustomField) (string, string) {
                 field_type = '[]'
                 field_annotations << 'fkey:'+field.applies_to.trim_left('CE_').to_lower()
             } else {
-                field_type = ''
+                return '    ${field.code.to_lower()} string @[sql_type: \'uuid\']',include
             }
             field_type += target_entity
             sql_type =''
@@ -173,7 +173,7 @@ fn generate_sql_field(field CustomField) (string, string) {
     }
 
     if field_annotations.len>0 {
-        field_annotation= '['+field_annotations.join(';')+']'
+        field_annotation= '@['+field_annotations.join(';')+']'
     }
 
     return '    ${field.code.to_lower()} $field_type $field_annotation',include
@@ -203,8 +203,8 @@ fn generate_vlang_file(entity CustomEntity, v_file_path string) ! {
         file_content += includes+'\n'
     }
     file_content += '@[table: \'$table_name\']\n'
-    file_content += 'struct ${entity.code} {\n'
-    file_content += '    uuid string [primary; sql_type: \'uuid\']\n'
+    file_content += 'pub struct ${entity.code} {\n'
+    file_content += '    uuid string @[primary; sql_type: \'uuid\']\n'
     for field_declaration in fields_declaration {
         file_content += field_declaration+'\n'
     }

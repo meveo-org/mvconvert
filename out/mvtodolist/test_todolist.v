@@ -1,10 +1,9 @@
-module mvtodolist
-
 import os
 import db.pg
 import time
+import mvtodolist
 
-fn main() ! {
+fn main() {
     mut db_host := os.getenv('DB_HOST')
     if db_host.len == 0 {
         db_host = 'localhost' // Default value for host
@@ -50,27 +49,24 @@ fn main() ! {
 		db.close()
 	}
 
-	sql db { create table TodoItem }!
-	sql db { create table TodoList }!
+	sql db { create table mvtodolist.TodoItem }!
+	sql db { create table mvtodolist.TodoList }!
 
-	mut new_item := TodoItem{
-		uuid: '21213-5454-545'
-		status: 'active'
-		value: 'Port meveo to Vlang.'
-	}
-
-	sql db { insert new_item into TodoItem }!
-
-	new_list := TodoList{
+	new_list := mvtodolist.TodoList{
 		uuid: '1151-45454-554'
 		active: true
 		creationdate: time.now()
 		name: 'My coding todo list.'
-		todoitems: [new_item]
+		todoitems: [mvtodolist.TodoItem{
+			uuid: '21213-5454-545'
+			status: 'active'
+			value: 'Port meveo to Vlang.'
+			todolist: '1151-45454-554'
+		}]
 	}
 
-	sql db { insert new_list into TodoList }!
-
+	sql db { insert new_list into mvtodolist.TodoList }!
+/*
 	selected_lists := sql db {
 		select from TodoList where name == 'My coding todo list.' limit 1
 	}!
@@ -90,4 +86,5 @@ fn main() ! {
 	sql db {
 		update TodoList set todoitems = [new_item,second_item] where uuid == my_coding_list.uuid
 	}!
+*/
 }
