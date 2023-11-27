@@ -127,7 +127,7 @@ fn generate_sql_field(field CustomField) (string, string) {
             target_entity := field_class.split(' ')[2]
             if field.storage_type == 'LIST' {
                 field_type = '[]'
-                field_annotations << 'pkey:fk_'+field.applies_to.trim_left('CE_').to_lower()
+                field_annotations << 'fkey:'+field.applies_to.trim_left('CE_').to_lower()
             } else {
                 field_type = ''
             }
@@ -162,7 +162,9 @@ fn generate_sql_field(field CustomField) (string, string) {
         [sql_type: 'SQL TYPE'] sets the sql type which is used in sql
         [default: 'raw_sql] inserts raw_sql verbatim in a "DEFAULT" clause whencreate a new table, allowing for values like CURRENT_TIME- [fkey: 'parent_id'] sets foreign key for an field which holds an array
     */
-
+    if sql_type.len > 0 { 
+        field_annotations <<'sql_type: \'$sql_type\'' 
+    } 
     if field.unique {
         field_annotations << ' unique'
     }
@@ -170,10 +172,9 @@ fn generate_sql_field(field CustomField) (string, string) {
         field_annotations << ' skip'
     }
 
-    field_annotation = if sql_type.len > 0 { '[sql_type: \'$sql_type\'' } else { '[' }
-    field_annotation += field_annotations.join('')
-    field_annotation = if field_annotation == '[' {''} else {field_annotation+' ]'} 
-
+    if field_annotations.len>0 {
+        field_annotation= '['+field_annotations.join(';')+']'
+    }
 
     return '    ${field.code.to_lower()} $field_type $field_annotation',include
 }
@@ -203,7 +204,7 @@ fn generate_vlang_file(entity CustomEntity, v_file_path string) ! {
     }
     file_content += '@[table: \'$table_name\']\n'
     file_content += 'struct ${entity.code} {\n'
-    file_content += '    uuid string [primary]\n'
+    file_content += '    uuid string [primary; sql_type: \'uuid\']\n'
     for field_declaration in fields_declaration {
         file_content += field_declaration+'\n'
     }

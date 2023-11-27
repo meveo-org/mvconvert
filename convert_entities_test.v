@@ -8,7 +8,7 @@ fn test_convert_entities() {
     cet_dir := './meveoModuleExample/mv-todolist/CustomEntityTemplate'
 	cft_dir := './meveoModuleExample/mv-todolist/CustomFieldTemplate'
     output_test_dir := './output'
-	todo_test_dir := './output/todo_test_dir'
+	todo_test_dir := './output/mvtodolist'
     os.mkdir_all(todo_test_dir) or { assert false, 'Failed to create test output directory' }
     println('Created test output directory: $todo_test_dir')
     //defer { os.rmdir_all(output_test_dir) or { } } // Clean up after test
