@@ -1,6 +1,5 @@
 import os
 import db.pg
-import time
 import mvtodolist
 
 fn main() {
@@ -49,13 +48,16 @@ fn main() {
 		db.close()
 	}
 
-	sql db { create table mvtodolist.TodoItem }!
-	sql db { create table mvtodolist.TodoList }!
+	sql db { create table mvtodolist.TodoItem } or {
+		println(err)
+	}
+	sql db { create table mvtodolist.TodoList } or {
+		println(err)
+	}
 
 	new_list := mvtodolist.TodoList{
 		uuid: '1151-45454-554'
 		active: true
-		creationdate: time.now()
 		name: 'My coding todo list.'
 		todoitems: [mvtodolist.TodoItem{
 			uuid: '21213-5454-545'

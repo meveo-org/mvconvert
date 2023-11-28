@@ -5,5 +5,5 @@ pub struct TodoItem {
     uuid string @[primary]
     value ?string 
     status ?string 
-    todolist string 
+    todolist string
 }

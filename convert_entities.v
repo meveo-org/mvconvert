@@ -106,9 +106,12 @@ fn generate_sql_field(field CustomField) (string, string) {
             sql_type =''
         }
         'DATE' {
-            field_type = 'time.Time'
+            field_type = 'string'
             sql_type ='TIMESTAMP'
-            include = 'time'
+            if(field.default_value or {''} == 'now()') {
+                field_annotations << 'default: \'CURRENT_TIMESTAMP\''
+            }
+            //include = 'time'
         }
         'LONG' {
             field_type = 'int64'
@@ -129,7 +132,7 @@ fn generate_sql_field(field CustomField) (string, string) {
                 field_type = '[]'
                 field_annotations << 'fkey:'+field.applies_to.trim_left('CE_').to_lower()
             } else {
-                return '    ${field.code.to_lower()} string @[sql_type: \'uuid\']',include
+                return '    ${field.code.to_lower()} string',include
             }
             field_type += target_entity
             sql_type =''
@@ -147,7 +150,10 @@ fn generate_sql_field(field CustomField) (string, string) {
             sql_type =''
         }
     }
-    if !field.value_required {
+    print('field_type: $field_type')
+    
+    // see https://github.com/vlang/v/issues/20013 and https://github.com/vlang/v/issues/20014 
+    if (!field.value_required) && (field_type != 'time.Time') && (field.field_type != 'ENTITY'){
         field_type = '?'+field_type
     }
 
@@ -204,7 +210,7 @@ fn generate_vlang_file(entity CustomEntity, v_file_path string) ! {
     }
     file_content += '@[table: \'$table_name\']\n'
     file_content += 'pub struct ${entity.code} {\n'
-    file_content += '    uuid string @[primary; sql_type: \'uuid\']\n'
+    file_content += '    uuid string @[primary]\n'
     for field_declaration in fields_declaration {
         file_content += field_declaration+'\n'
     }
