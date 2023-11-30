@@ -115,7 +115,7 @@ fn generate_sql_field(field CustomField) (string, string) {
             //include = 'time'
         }
         'LONG' {
-            field_type = 'int64'
+            field_type = 'i64'
             sql_type ='bigint'
         }
         'DOUBLE' {
@@ -215,7 +215,7 @@ fn generate_vlang_file(entity CustomEntity, v_file_path string) ! {
     }
     file_content += '@[table: \'$table_name\']\n'
     file_content += 'pub struct ${entity.code} {\n'
-    file_content += '    uuid string @[primary  sql_type: \'character varying(255)\']\n'
+    file_content += '    uuid string @[primary;  sql_type: \'character varying(255)\'; default:\'uuid_generate_v4()\']\n'
     for field_declaration in fields_declaration {
         file_content += field_declaration+'\n'
     }

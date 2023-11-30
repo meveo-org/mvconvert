@@ -4,7 +4,7 @@ import os
 import json
 
 struct ModuleData {
-	code                string
+	mut: code                string
 	description         string
 	license             ?string
 	current_version     string   @[json: currentVersion]
@@ -50,10 +50,10 @@ fn convert_module_config(module_json_path string, v_mod_path string) !string {
 	}
 
 	// Parse the JSON data
-	module_data := json.decode(ModuleData, module_json_bytes) or {
+	mut module_data := json.decode(ModuleData, module_json_bytes) or {
 		return error('Failed to decode JSON: $err')
 	}
-
+	module_data.code = module_data.code.replace('-', '').replace('_', '').to_lower()
 	vmod_content := create_vmod_content(module_data)
 
 	os.write_file(v_mod_path, vmod_content) or {
@@ -77,7 +77,7 @@ pub fn convert_module(meveo_module_path string, v_module_path string) {
 	}
 	cet_dir := './customEntityTemplates'
 	cft_dir := './customFieldTemplates'
-	
+
 	// convert custom entities
 	result := convert_entities(cet_dir, cft_dir, v_module_path,module_name) or {
         assert false, 'Function failed: $err'
