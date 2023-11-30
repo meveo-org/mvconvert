@@ -91,7 +91,8 @@ fn generate_sql_field(field CustomField) (string, string) {
         }
         'STRING' {
             field_type = 'string'
-            sql_type =''
+            max_value := field.max_value or {255}
+            sql_type ='character varying('+max_value.str()+')'
         }
         'LIST' {
             field_type = 'string'
@@ -99,7 +100,7 @@ fn generate_sql_field(field CustomField) (string, string) {
         }
         'LONG_TEXT' {
             field_type = 'string'
-            sql_type =''
+            sql_type ='text'
         }
         'INTEGER' {
             field_type = 'int'
@@ -107,15 +108,15 @@ fn generate_sql_field(field CustomField) (string, string) {
         }
         'DATE' {
             field_type = 'string'
-            sql_type ='TIMESTAMP'
-            if(field.default_value or {''} == 'now()') {
+            sql_type ='timestamp without time zone'
+            if field.default_value or {''} == 'now()' {
                 field_annotations << 'default: \'CURRENT_TIMESTAMP\''
             }
             //include = 'time'
         }
         'LONG' {
             field_type = 'int64'
-            sql_type =''
+            sql_type ='bigint'
         }
         'DOUBLE' {
             field_type = 'float64'
@@ -177,6 +178,10 @@ fn generate_sql_field(field CustomField) (string, string) {
     if !field.persisted {
         field_annotations << ' skip'
     }
+    default_value := field.default_value or {''}
+    if default_value.len > 0 {
+        field_annotations << ' default: \''+default_value+'\''
+    }
 
     if field_annotations.len>0 {
         field_annotation= '@['+field_annotations.join(';')+']'
@@ -210,7 +215,7 @@ fn generate_vlang_file(entity CustomEntity, v_file_path string) ! {
     }
     file_content += '@[table: \'$table_name\']\n'
     file_content += 'pub struct ${entity.code} {\n'
-    file_content += '    uuid string @[primary]\n'
+    file_content += '    uuid string @[primary  sql_type: \'character varying(255)\']\n'
     for field_declaration in fields_declaration {
         file_content += field_declaration+'\n'
     }

@@ -43,7 +43,7 @@ Module {
 }'
 }
 
-fn convert_module_config(module_json_path string, v_mod_path string) ! {
+fn convert_module_config(module_json_path string, v_mod_path string) !string {
 	// Read the module.json file
 	module_json_bytes := os.read_file(module_json_path) or {
 		return error('Failed to read module.json')
@@ -59,6 +59,8 @@ fn convert_module_config(module_json_path string, v_mod_path string) ! {
 	os.write_file(v_mod_path, vmod_content) or {
 		return error('Failed to write v.mod file: $err')
 	}
+
+	return module_data.code
 }
 
 pub fn convert_module(meveo_module_path string, v_module_path string) {
@@ -69,12 +71,19 @@ pub fn convert_module(meveo_module_path string, v_module_path string) {
     ensure_directory_exists(v_module_path)
 
 	// Convert module.json to v.mod
-	convert_module_config(module_json_path, v_mod_path) or {
+	module_name := convert_module_config(module_json_path, v_mod_path) or {
 		eprintln('Failed to convert module.json to v.mod: ${err}')
+		return
 	}
-
-	// TODO: convert the custom entities
-
+	cet_dir := './customEntityTemplates'
+	cft_dir := './customFieldTemplates'
+	
+	// convert custom entities
+	result := convert_entities(cet_dir, cft_dir, v_module_path,module_name) or {
+        assert false, 'Function failed: $err'
+		[]FileError{}
+    }
+    eprintln('convert_entities result: $result')
 	// TODO: convert the Rest endpoints
 	println('Conversion completed successfully!')
 }
