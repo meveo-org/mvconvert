@@ -79,9 +79,9 @@ pub fn convert_module(meveo_module_path string, v_module_path string) {
 	cft_dir := './customFieldTemplates'
 
 	// convert custom entities
-	result := convert_entities(cet_dir, cft_dir, v_module_path,module_name) or {
+	result,_ := convert_entities(cet_dir, cft_dir, v_module_path,module_name) or {
         assert false, 'Function failed: $err'
-		[]FileError{}
+		[]FileError{},[]CustomEntity{}
     }
     eprintln('convert_entities result: $result')
 	// TODO: convert the Rest endpoints

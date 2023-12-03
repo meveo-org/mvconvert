@@ -109,9 +109,6 @@ fn generate_sql_field(field CustomField) (string, string) {
         'DATE' {
             field_type = 'string'
             sql_type ='timestamp without time zone'
-            if field.default_value or {''} == 'now()' {
-                field_annotations << 'default: \'CURRENT_TIMESTAMP\''
-            }
             //include = 'time'
         }
         'LONG' {
@@ -180,7 +177,11 @@ fn generate_sql_field(field CustomField) (string, string) {
     }
     default_value := field.default_value or {''}
     if default_value.len > 0 {
-        field_annotations << ' default: \''+default_value+'\''
+        if default_value == 'now()' {
+            field_annotations << ' default: \'CURRENT_TIMESTAMP\''
+        } else {
+            field_annotations << ' default: \'\\\''+default_value+'\\\'\''
+        }
     }
 
     if field_annotations.len>0 {
@@ -215,7 +216,7 @@ fn generate_vlang_file(entity CustomEntity, v_file_path string) ! {
     }
     file_content += '@[table: \'$table_name\']\n'
     file_content += 'pub struct ${entity.code} {\n'
-    file_content += '    uuid string @[primary;  sql_type: \'character varying(255)\'; default:\'uuid_generate_v4()\']\n'
+    file_content += '    uuid string @[primary;  sql_type: \'character varying(255)\'; default: \'uuid_generate_v4()\' ]\n'
     for field_declaration in fields_declaration {
         file_content += field_declaration+'\n'
     }
@@ -224,9 +225,11 @@ fn generate_vlang_file(entity CustomEntity, v_file_path string) ! {
     os.write_file(v_file_path, file_content) or { return err }
 }
 
-fn convert_entities(cet_dir string, cft_dir string, target_dir string,module_name string) ![]FileError {
+
+fn convert_entities(cet_dir string, cft_dir string, target_dir string,module_name string) !([]FileError,[]CustomEntity) {
 	files := os.ls(cet_dir) or { return error('Failed to list directory: $cet_dir') }
     mut errors := []FileError{}
+	mut custom_entities := []CustomEntity{}
     eprintln('files in  $cet_dir: $files')
 	for cet_json_filename in files {
 		if cet_json_filename.ends_with('.json') {
@@ -242,7 +245,8 @@ fn convert_entities(cet_dir string, cft_dir string, target_dir string,module_nam
             generate_vlang_file(custom_entity, v_file_name) or {
                 errors << FileError{v_file_name, err.msg()}
             }
+			custom_entities << custom_entity
 		}
 	}
-    return errors
+    return errors,custom_entities
 }
