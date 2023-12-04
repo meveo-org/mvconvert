@@ -5,10 +5,10 @@ import os
 fn test_convert_entities() {
     println('Running test: test_convert_entities')
     // Setup test data
-    cet_dir := './meveoModuleExample/mv-todolist/customEntityTemplates'
-	cft_dir := './meveoModuleExample/mv-todolist/customFieldTemplates'
-    output_test_dir := './out'
-	todo_test_dir := './out/mvtodolist'
+    cet_dir := os.join_path('meveoModuleExample','mv-todolist','customEntityTemplates')
+	cft_dir := os.join_path('meveoModuleExample','mv-todolist','customFieldTemplates')
+    output_test_dir := 'out'
+	todo_test_dir := os.join_path('out','mvtodolist')
     os.mkdir_all(todo_test_dir) or { assert false, 'Failed to create test output directory' }
     println('Created test output directory: $todo_test_dir')
     //defer { os.rmdir_all(output_test_dir) or { } } // Clean up after test
@@ -27,5 +27,5 @@ fn test_convert_entities() {
         assert false, 'Function failed: $err'
     }
     //check a create_tables.v file has been created in todo_test_dir
-    assert os.exists(output_test_dir + '/create_tables.v'), 'create_tables.v file not created'
+    assert os.exists(os.join_path(output_test_dir,'create_tables.v')), 'create_tables.v file not created'
 }

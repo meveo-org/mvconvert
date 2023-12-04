@@ -9,7 +9,7 @@ fn create_db_file(entities []CustomEntity, target_dir string, module_name string
 	mut file_content := ('
 import os
 import db.pg
-import mvtodolist
+import ${module_name}
 
 fn main() {
     mut db_host := os.getenv(\'DB_HOST\')
